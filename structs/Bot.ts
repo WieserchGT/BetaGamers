@@ -32,6 +32,10 @@ export class Bot {
     this.client.on("ready", () => {
       console.log(`${this.client.user!.username} ready!`);
 
+      this.client.user!.setActivity('dev: WieserchGT - wieserch.com', { 
+        type: 2
+      });
+
       this.registerSlashCommands();
     });
 
