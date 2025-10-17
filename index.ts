@@ -1,3 +1,18 @@
+import express from 'express'; // ✅ AGREGA ESTA IMPORTACIÓN
+
+// ✅ AGREGA ESTE CÓDIGO DEL SERVIDOR EXPRESS
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', message: 'Bot is running' });
+});
+
+app.listen(PORT, () => {
+    console.log(`✅ Health check server running on port ${PORT}`);
+});
+
+// TU CÓDIGO ORIGINAL (todo lo que ya tienes):
 import { Client, GatewayIntentBits } from "discord.js";
 import { Bot } from "./structs/Bot";
 import * as fs from "node:fs";
