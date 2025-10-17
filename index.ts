@@ -1,4 +1,5 @@
-import express from 'express';
+// ✅ USAMOS REQUIRE EN LUGAR DE IMPORT PARA EVITAR ERRORES DE TIPOS
+const express = require('express');
 
 // ✅ SERVERT EXPRESS PARA RENDER
 const app = express();
