@@ -49,12 +49,24 @@ export default {
       return bot.slashCommandsMap.get("playlist")!.execute(interaction, "song");
     }
 
-    let song;
+    let song: Song | null = null;
 
     try {
-      song = await Song.from(url, url);
+      const songResult = await Song.from(url, url);
+      if (!songResult) {
+        return interaction.editReply({ 
+          content: i18n.__("common.errorCommand") 
+        }).catch(console.error);
+      }
+      song = songResult;
     } catch (error: any) {
       console.error(error);
+
+      if (error.name === "RateLimited" || error.message === 'RATE_LIMITED') {
+        return interaction.editReply({ 
+          content: '⚠️ YouTube está bloqueando las peticiones. Por favor espera unos minutos antes de intentar nuevamente.' 
+        }).catch(console.error);
+      }
 
       if (error.name == "NoResults") {
         return interaction.editReply({ 
@@ -68,6 +80,12 @@ export default {
         }).catch(console.error);
       }
 
+      return interaction.editReply({ 
+        content: i18n.__("common.errorCommand") 
+      }).catch(console.error);
+    }
+
+    if (!song) {
       return interaction.editReply({ 
         content: i18n.__("common.errorCommand") 
       }).catch(console.error);
