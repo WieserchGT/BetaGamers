@@ -1,0 +1,7 @@
+{
+  "name": "BetaGaming",
+  "description": "BetaGaming - A custom Discord bot",
+  "repository": "https://github.com/eritislami/evobot",
+  "logo": "https://i.imgur.com/JFxgbWH.png",
+  "keywords": ["discord", "discordjs", "typescript", "music", "bot"]
+}
