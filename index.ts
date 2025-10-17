@@ -1,19 +1,3 @@
-// ✅ USAMOS REQUIRE EN LUGAR DE IMPORT PARA EVITAR ERRORES DE TIPOS
-const express = require('express');
-
-// ✅ SERVERT EXPRESS PARA RENDER
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.get('/health', (req: any, res: any) => {
-    res.status(200).json({ status: 'OK', message: 'Bot is running' });
-});
-
-app.listen(PORT, () => {
-    console.log(`✅ Health check server running on port ${PORT}`);
-});
-
-// TU CÓDIGO ORIGINAL (todo lo que ya tienes):
 import { Client, GatewayIntentBits } from "discord.js";
 import { Bot } from "./structs/Bot";
 import * as fs from "node:fs";
