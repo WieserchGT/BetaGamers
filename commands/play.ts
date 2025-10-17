@@ -40,13 +40,11 @@ export default {
 
     const url = argSongName;
 
-    if (interaction.replied) await interaction.editReply("⏳ Loading...").catch(console.error);
-    else await interaction.reply("⏳ Loading...");
+    await interaction.deferReply();
 
     // Start the playlist if playlist url was provided
     if (playlistPattern.test(url)) {
       await interaction.editReply("🔗 Link is playlist").catch(console.error);
-
       return bot.slashCommandsMap.get("playlist")!.execute(interaction, "song");
     }
 
@@ -59,22 +57,23 @@ export default {
 
       if (error.name == "NoResults")
         return interaction
-          .reply({ content: i18n.__mf("play.errorNoResults", { url: `<${url}>` }), ephemeral: true })
+          .editReply({ content: i18n.__mf("play.errorNoResults", { url: `<${url}>` }) })
           .catch(console.error);
 
       if (error.name == "InvalidURL")
         return interaction
-          .reply({ content: i18n.__mf("play.errorInvalidURL", { url: `<${url}>` }), ephemeral: true })
+          .editReply({ content: i18n.__mf("play.errorInvalidURL", { url: `<${url}>` }) })
           .catch(console.error);
 
-      if (interaction.replied)
-        return await interaction.editReply({ content: i18n.__("common.errorCommand") }).catch(console.error);
-      else return interaction.reply({ content: i18n.__("common.errorCommand"), ephemeral: true }).catch(console.error);
+      return interaction
+        .editReply({ content: i18n.__("common.errorCommand") })
+        .catch(console.error);
     }
 
     if (queue) {
       queue.enqueue(song);
-
+      await interaction.deleteReply().catch(console.error);
+      
       return (interaction.channel as TextChannel)
         .send({ content: i18n.__mf("play.queueAdded", { title: song.title, author: interaction.user.id }) })
         .catch(console.error);
@@ -91,8 +90,7 @@ export default {
     });
 
     bot.queues.set(interaction.guild!.id, newQueue);
-
     newQueue.enqueue(song);
-    interaction.deleteReply().catch(console.error);
+    await interaction.deleteReply().catch(console.error);
   }
 };
