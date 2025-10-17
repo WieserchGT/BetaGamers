@@ -32,7 +32,7 @@ export class Bot {
     this.client.on("ready", () => {
       console.log(`${this.client.user!.username} ready!`);
 
-      this.client.user!.setActivity('Dev: WieserchGT - wieserch.com', { 
+      this.client.user!.setActivity('dev: WieserchGT - wieserch.com', { 
         type: 2
       });
 
@@ -46,18 +46,29 @@ export class Bot {
   }
 
   private async registerSlashCommands() {
-    const rest = new REST({ version: "9" }).setToken(config.TOKEN);
+    const rest = new REST({ version: "10" }).setToken(config.TOKEN);
 
     const commandFiles = readdirSync(join(__dirname, "..", "commands")).filter((file) => !file.endsWith(".map"));
 
     for (const file of commandFiles) {
       const command = await import(join(__dirname, "..", "commands", `${file}`));
-
+      
+      const commandName = command.default.data.name;
+      
+      if (commandName === "help" || commandName === "play" || commandName === "stop") {
+        if (command.default.data.setIntegrationTypes && command.default.data.setContexts) {
+          command.default.data.setIntegrationTypes([0, 1]);
+          command.default.data.setContexts([0, 2]);
+        }
+      }
+      
       this.slashCommands.push(command.default.data);
-      this.slashCommandsMap.set(command.default.data.name, command.default);
+      this.slashCommandsMap.set(commandName, command.default);
     }
 
-    await rest.put(Routes.applicationCommands(this.client.user!.id), { body: this.slashCommands });
+    await rest.put(Routes.applicationCommands(this.client.user!.id), { 
+      body: this.slashCommands 
+    });
   }
 
   private async onInteractionCreate() {
