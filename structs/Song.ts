@@ -40,18 +40,12 @@ export class Song {
     const isYoutubeUrl = videoPattern.test(url);
 
     if (isYoutubeUrl) {
-      const videoInfo: any = await youtubedl(url, {
-        dumpSingleJson: true,
-        noCheckCertificates: true,
-        noWarnings: true,
-        preferFreeFormats: true,
-        addHeader: ['referer:youtube.com', 'user-agent:googlebot']
-      });
-
+      const video = await youtube.getVideo(url);
+      
       return new this({
-        url: videoInfo.webpage_url || videoInfo.url,
-        title: videoInfo.title,
-        duration: videoInfo.duration
+        url: video.url,
+        title: video.title || "Unknown Title",
+        duration: video.duration / 1000
       });
     } else {
       const result = await youtube.searchOne(search);
@@ -63,18 +57,12 @@ export class Song {
         throw err;
       }
 
-      const videoInfo: any = await youtubedl(`https://youtube.com/watch?v=${result.id}`, {
-        dumpSingleJson: true,
-        noCheckCertificates: true,
-        noWarnings: true,
-        preferFreeFormats: true,
-        addHeader: ['referer:youtube.com', 'user-agent:googlebot']
-      });
-
+      const video = await youtube.getVideo(`https://youtube.com/watch?v=${result.id}`);
+      
       return new this({
-        url: videoInfo.webpage_url || videoInfo.url,
-        title: videoInfo.title,
-        duration: videoInfo.duration
+        url: video.url,
+        title: video.title || "Unknown Title",
+        duration: video.duration / 1000
       });
     }
   }
