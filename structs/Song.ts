@@ -122,7 +122,7 @@ export class Song {
 
       audioStream.once('info', () => dlog('song.ytdl.stream.info'));
       
-      audioStream.on('error', (error) => {
+      audioStream.on('error', (error: Error) => {
         dlog('song.ytdl.stream.error', { message: error.message });
       });
 
