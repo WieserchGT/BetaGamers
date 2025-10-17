@@ -4,7 +4,7 @@
 
 ![logo](https://github.com/WieserchGT/BetaGamers/blob/main/betagaming.jpg?raw=true)
 
-# 🎮 BetaGaming (Discord Music Bot)
+# BetaGaming (Discord Music Bot)
 
 > BetaGaming is a Discord Music Bot built by **Cristian Arciniega** with collaboration from **EvoBot**, using TypeScript, discord.js & Command Handler from [discordjs.guide](https://discordjs.guide)
 
