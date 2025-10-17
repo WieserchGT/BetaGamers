@@ -30,7 +30,7 @@
     "lyrics-finder": "^21.0.5",
     "soundcloud-downloader": "^0.2.3",
     "string-progressbar": "^1.0.4",
-    "youtube-dl-exec": "^3.0.25",
+    "youtube-dl-exec": "^3.0.26",
     "youtube-sr": "~4.3.0"
   },
   "devDependencies": {
