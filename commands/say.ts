@@ -13,7 +13,7 @@ export default {
     ),
   cooldown: 5,
   execute(interaction: ChatInputCommandInteraction) {
-    const mensaje = interaction.options.getString("mensaje");
+    const mensaje = interaction.options.getString("mensaje", true);
     
     // Verificar que el mensaje no esté vacío
     if (!mensaje) {
