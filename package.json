@@ -20,6 +20,7 @@
     "format": "npx prettier --write '**/*.ts' --config .prettierrc"
   },
   "dependencies": {
+    "express": "^4.18.0",
     "@discordjs/voice": "^0.16.0",
     "@snazzah/davey": "^0.1.7",
     "array-move": "^3.0.1",
