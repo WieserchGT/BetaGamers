@@ -14,33 +14,34 @@ export default {
   cooldown: 3,
   permissions: [PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak],
   async execute(interaction: ChatInputCommandInteraction, input: string) {
+    // ✅ RESPONDER INMEDIATAMENTE - mover deferReply al inicio
+    await interaction.deferReply();
+
     let argSongName = interaction.options.getString("song");
     if (!argSongName) argSongName = input;
 
     const guildMember = interaction.guild!.members.cache.get(interaction.user.id);
     const { channel } = guildMember!.voice;
 
-    if (!channel)
-      return interaction.reply({ content: i18n.__("play.errorNotChannel"), ephemeral: true }).catch(console.error);
+    if (!channel) {
+      return interaction.editReply({ content: i18n.__("play.errorNotChannel") }).catch(console.error);
+    }
 
     const queue = bot.queues.get(interaction.guild!.id);
 
-    if (queue && channel.id !== queue.connection.joinConfig.channelId)
-      return interaction
-        .reply({
-          content: i18n.__mf("play.errorNotInSameChannel", { user: bot.client.user!.username }),
-          ephemeral: true
-        })
-        .catch(console.error);
+    if (queue && channel.id !== queue.connection.joinConfig.channelId) {
+      return interaction.editReply({
+        content: i18n.__mf("play.errorNotInSameChannel", { user: bot.client.user!.username })
+      }).catch(console.error);
+    }
 
-    if (!argSongName)
-      return interaction
-        .reply({ content: i18n.__mf("play.usageReply", { prefix: bot.prefix }), ephemeral: true })
-        .catch(console.error);
+    if (!argSongName) {
+      return interaction.editReply({ 
+        content: i18n.__mf("play.usageReply", { prefix: bot.prefix }) 
+      }).catch(console.error);
+    }
 
     const url = argSongName;
-
-    await interaction.deferReply();
 
     // Start the playlist if playlist url was provided
     if (playlistPattern.test(url)) {
@@ -55,28 +56,35 @@ export default {
     } catch (error: any) {
       console.error(error);
 
-      if (error.name == "NoResults")
-        return interaction
-          .editReply({ content: i18n.__mf("play.errorNoResults", { url: `<${url}>` }) })
-          .catch(console.error);
+      if (error.name == "NoResults") {
+        return interaction.editReply({ 
+          content: i18n.__mf("play.errorNoResults", { url: `<${url}>` }) 
+        }).catch(console.error);
+      }
 
-      if (error.name == "InvalidURL")
-        return interaction
-          .editReply({ content: i18n.__mf("play.errorInvalidURL", { url: `<${url}>` }) })
-          .catch(console.error);
+      if (error.name == "InvalidURL") {
+        return interaction.editReply({ 
+          content: i18n.__mf("play.errorInvalidURL", { url: `<${url}>` }) 
+        }).catch(console.error);
+      }
 
-      return interaction
-        .editReply({ content: i18n.__("common.errorCommand") })
-        .catch(console.error);
+      return interaction.editReply({ 
+        content: i18n.__("common.errorCommand") 
+      }).catch(console.error);
     }
 
     if (queue) {
       queue.enqueue(song);
-      await interaction.deleteReply().catch(console.error);
       
-      return (interaction.channel as TextChannel)
-        .send({ content: i18n.__mf("play.queueAdded", { title: song.title, author: interaction.user.id }) })
-        .catch(console.error);
+      // ✅ Usar editReply en lugar de deleteReply + send
+      return interaction.editReply({ 
+        content: i18n.__mf("play.queueAdded", { title: song.title, author: interaction.user.id }) 
+      }).then(() => {
+        // Opcional: eliminar el mensaje después de unos segundos
+        setTimeout(() => {
+          interaction.deleteReply().catch(console.error);
+        }, 5000);
+      }).catch(console.error);
     }
 
     const newQueue = new MusicQueue({
@@ -91,6 +99,14 @@ export default {
 
     bot.queues.set(interaction.guild!.id, newQueue);
     newQueue.enqueue(song);
-    await interaction.deleteReply().catch(console.error);
+    
+    // ✅ Usar editReply para confirmación
+    return interaction.editReply({ 
+      content: i18n.__mf("play.startedPlaying", { title: song.title }) 
+    }).then(() => {
+      setTimeout(() => {
+        interaction.deleteReply().catch(console.error);
+      }, 5000);
+    }).catch(console.error);
   }
 };
