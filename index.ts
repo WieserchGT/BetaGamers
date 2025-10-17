@@ -38,7 +38,7 @@ try {
   console.error('Error setting up debug file:', err);
 }
 
-// 4. FINALMENTE el bot
+// 4. FINALMENTE el bot (se auto-inicia en el constructor)
 export const bot = new Bot(
   new Client({
     intents: [
@@ -52,10 +52,7 @@ export const bot = new Bot(
   })
 );
 
-// 5. Asegurarse de que el bot se INICIE
-bot.start().catch(console.error);
-
-// 6. Manejar cierre graceful
+// 5. Manejar cierre graceful
 process.on('SIGTERM', () => {
   console.log('Received SIGTERM, shutting down gracefully');
   server.close(() => {
