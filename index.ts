@@ -1,10 +1,10 @@
-import express from 'express'; // ✅ AGREGA ESTA IMPORTACIÓN
+import express from 'express';
 
-// ✅ AGREGA ESTE CÓDIGO DEL SERVIDOR EXPRESS
+// ✅ SERVERT EXPRESS PARA RENDER
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: any, res: any) => {
     res.status(200).json({ status: 'OK', message: 'Bot is running' });
 });
 
