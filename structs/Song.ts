@@ -2,7 +2,7 @@ import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice
 import youtube from "youtube-sr";
 import { i18n } from "../utils/i18n";
 import { videoPattern, isURL } from "../utils/patterns";
-import ytdl from "@distube/ytdl-core";
+import ytdl from "ytdl-core";
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
@@ -69,7 +69,7 @@ export class Song {
         dlog('song.search.found', { title: result.title, url: videoUrl });
       }
 
-      // Usar @distube/ytdl-core para obtener información del video
+      // Usar ytdl-core para obtener información del video
       dlog('song.ytdl.getInfo', { url: videoUrl });
       const info = await ytdl.getInfo(videoUrl);
       const videoDetails = info.videoDetails;
