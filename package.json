@@ -23,7 +23,7 @@
     "@discordjs/voice": "^0.16.0",
     "@snazzah/davey": "^0.1.7",
     "array-move": "^3.0.1",
-    "discord.js": "^14.15.3",
+    "discord.js": "^14.23.2",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
     "ffmpeg-static": "^4.4.1",
