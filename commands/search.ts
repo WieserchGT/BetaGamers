@@ -5,7 +5,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuInteraction
 } from "discord.js";
-import youtube, { Video } from "youtube-sr";
+import play from "play-dl";
 import { bot } from "..";
 import { i18n } from "../utils/i18n";
 
@@ -27,10 +27,11 @@ export default {
 
     await interaction.reply("⏳ Loading...").catch(console.error);
 
-    let results: Video[] = [];
+    let results: any[] = [];
 
     try {
-      results = await youtube.search(search, { limit: 10, type: "video" });
+      // Usar play-dl para buscar
+      results = await play.search(search, { limit: 10 });
     } catch (error) {
       console.error(error);
       interaction.editReply({ content: i18n.__("common.errorCommand") }).catch(console.error);
@@ -42,24 +43,29 @@ export default {
       return;
     }
 
-    const options = results!.map((video) => {
+    const options = results.map((video, index) => {
+      const duration = video.durationInSec ? 
+        `${Math.floor(video.durationInSec / 60)}:${Math.floor(video.durationInSec % 60).toString().padStart(2, '0')}` : 
+        "N/A";
+      
       return {
-        label: video.title ?? "",
-        value: video.url
+        label: video.title ? (video.title.length > 100 ? video.title.substring(0, 97) + "..." : video.title) : "Sin título",
+        value: index.toString(),
+        description: `Duración: ${duration}`
       };
     });
 
     const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       new StringSelectMenuBuilder()
         .setCustomId("search-select")
-        .setPlaceholder("Nothing selected")
+        .setPlaceholder("Selecciona una canción")
         .setMinValues(1)
-        .setMaxValues(10)
+        .setMaxValues(1) // Cambiado a 1 para evitar múltiples ejecuciones
         .addOptions(options)
     );
 
     const followUp = await interaction.followUp({
-      content: "Choose songs to play",
+      content: "🎵 Elige una canción para reproducir:",
       components: [row]
     });
 
@@ -70,17 +76,23 @@ export default {
       .then((selectInteraction) => {
         if (!(selectInteraction instanceof StringSelectMenuInteraction)) return;
 
-        selectInteraction.update({ content: "⏳ Loading the selected songs...", components: [] });
+        const selectedIndex = parseInt(selectInteraction.values[0]);
+        const selectedVideo = results[selectedIndex];
 
+        selectInteraction.update({ content: `⏳ Cargando: **${selectedVideo.title}**`, components: [] });
+
+        // Ejecutar el comando play con la URL seleccionada
         bot.slashCommandsMap
           .get("play")!
-          .execute(interaction, selectInteraction.values[0])
-          .then(() => {
-            selectInteraction.values.slice(1).forEach((url) => {
-              bot.slashCommandsMap.get("play")!.execute(interaction, url);
-            });
+          .execute(interaction, selectedVideo.url)
+          .catch((error: any) => {
+            console.error("Error ejecutando play:", error);
+            selectInteraction.editReply({ content: "❌ Error al reproducir la canción seleccionada." });
           });
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error("Error en selección:", error);
+        interaction.editReply({ content: "⏰ Tiempo de selección agotado." }).catch(console.error);
+      });
   }
 };

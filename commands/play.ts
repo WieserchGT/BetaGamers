@@ -3,128 +3,108 @@ import { ChatInputCommandInteraction, PermissionsBitField, SlashCommandBuilder, 
 import { bot } from "../index";
 import { MusicQueue } from "../structs/MusicQueue";
 import { Song } from "../structs/Song";
-import { i18n } from "../utils/i18n";
+import { i18n as i18nConfig } from "../utils/i18n";
 import { playlistPattern } from "../utils/patterns";
+import play from "play-dl";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("play")
-    .setDescription(i18n.__("play.description"))
+    .setDescription(i18nConfig.__("play.description"))
     .addStringOption((option) => option.setName("song").setDescription("The song you want to play").setRequired(true)),
   cooldown: 3,
   permissions: [PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak],
-  async execute(interaction: ChatInputCommandInteraction, input: string) {
-    // ✅ RESPONDER INMEDIATAMENTE - mover deferReply al inicio
-    await interaction.deferReply();
+  async execute(interaction: ChatInputCommandInteraction) {
+    if (!interaction.isCommand() || interaction.deferred || interaction.replied) {
+      return;
+    }
 
-    let argSongName = interaction.options.getString("song");
-    if (!argSongName) argSongName = input;
+    try {
+      await interaction.deferReply();
+    } catch (error: any) {
+      if (error.code === 10062) return;
+      return;
+    }
 
+    const argSongName = interaction.options.getString("song");
     const guildMember = interaction.guild!.members.cache.get(interaction.user.id);
     const { channel } = guildMember!.voice;
 
     if (!channel) {
-      return interaction.editReply({ content: i18n.__("play.errorNotChannel") }).catch(console.error);
+      return interaction.editReply({ content: i18nConfig.__("play.errorNotChannel") });
     }
 
     const queue = bot.queues.get(interaction.guild!.id);
 
     if (queue && channel.id !== queue.connection.joinConfig.channelId) {
       return interaction.editReply({
-        content: i18n.__mf("play.errorNotInSameChannel", { user: bot.client.user!.username })
-      }).catch(console.error);
+        content: i18nConfig.__mf("play.errorNotInSameChannel", { user: bot.client.user!.username })
+      });
     }
 
     if (!argSongName) {
       return interaction.editReply({ 
-        content: i18n.__mf("play.usageReply", { prefix: bot.prefix }) 
-      }).catch(console.error);
+        content: i18nConfig.__mf("play.usageReply", { prefix: bot.prefix })
+      });
     }
 
-    const url = argSongName;
-
-    // Start the playlist if playlist url was provided
-    if (playlistPattern.test(url)) {
-      await interaction.editReply("🔗 Link is playlist").catch(console.error);
-      return bot.slashCommandsMap.get("playlist")!.execute(interaction, "song");
+    if (playlistPattern.test(argSongName)) {
+      await interaction.editReply("🎵 Lista de reproducción detectada");
+      return;
     }
-
-    let song: Song | null = null;
 
     try {
-      const songResult = await Song.from(url, url);
-      if (!songResult) {
-        return interaction.editReply({ 
-          content: i18n.__("common.errorCommand") 
-        }).catch(console.error);
-      }
-      song = songResult;
-    } catch (error: any) {
-      console.error(error);
-
-      if (error.name === "RateLimited" || error.message === 'RATE_LIMITED') {
-        return interaction.editReply({ 
-          content: '⚠️ YouTube está bloqueando las peticiones. Por favor espera unos minutos antes de intentar nuevamente.' 
-        }).catch(console.error);
-      }
-
-      if (error.name == "NoResults") {
-        return interaction.editReply({ 
-          content: i18n.__mf("play.errorNoResults", { url: `<${url}>` }) 
-        }).catch(console.error);
-      }
-
-      if (error.name == "InvalidURL") {
-        return interaction.editReply({ 
-          content: i18n.__mf("play.errorInvalidURL", { url: `<${url}>` }) 
-        }).catch(console.error);
-      }
-
-      return interaction.editReply({ 
-        content: i18n.__("common.errorCommand") 
-      }).catch(console.error);
-    }
-
-    if (!song) {
-      return interaction.editReply({ 
-        content: i18n.__("common.errorCommand") 
-      }).catch(console.error);
-    }
-
-    if (queue) {
-      queue.enqueue(song);
+      // ✅ USANDO play-dl EN LUGAR DE youtube-dl-exec
+      const song = await Song.from(argSongName, argSongName);
       
-      // ✅ Usar editReply en lugar de deleteReply + send
+      if (!song) {
+        return interaction.editReply({ 
+          content: i18nConfig.__mf("play.errorNoResults", { url: `<${argSongName}>` })
+        });
+      }
+
+      if (queue) {
+        queue.enqueue(song);
+        return interaction.editReply({ 
+          content: i18nConfig.__mf("play.queueAdded", { title: song.title, author: interaction.user.id })
+        });
+      }
+
+      const newQueue = new MusicQueue({
+        interaction,
+        textChannel: interaction.channel! as TextChannel,
+        connection: joinVoiceChannel({
+          channelId: channel.id,
+          guildId: channel.guild.id,
+          adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
+        })
+      });
+
+      bot.queues.set(interaction.guild!.id, newQueue);
+      newQueue.enqueue(song);
+      
       return interaction.editReply({ 
-        content: i18n.__mf("play.queueAdded", { title: song.title, author: interaction.user.id }) 
-      }).then(() => {
-        // Opcional: eliminar el mensaje después de unos segundos
-        setTimeout(() => {
-          interaction.deleteReply().catch(console.error);
-        }, 5000);
-      }).catch(console.error);
+        content: i18nConfig.__mf("play.startedPlaying", { title: song.title })
+      });
+
+    } catch (error: any) {
+      console.error("Error en comando play:", error);
+      
+      if (error.name === "NoResults" || error.message?.includes("No se encontraron resultados")) {
+        return interaction.editReply({ 
+          content: i18nConfig.__mf("play.errorNoResults", { url: `<${argSongName}>` })
+        });
+      }
+
+      if (error.message?.includes("Sign in to confirm")) {
+        return interaction.editReply({ 
+          content: "❌ YouTube está bloqueando las descargas. El bot se está actualizando para solucionarlo."
+        });
+      }
+
+      return interaction.editReply({ 
+        content: '❌ Error al procesar la canción.' 
+      });
     }
-
-    const newQueue = new MusicQueue({
-      interaction,
-      textChannel: interaction.channel! as TextChannel,
-      connection: joinVoiceChannel({
-        channelId: channel.id,
-        guildId: channel.guild.id,
-        adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator
-      })
-    });
-
-    bot.queues.set(interaction.guild!.id, newQueue);
-    newQueue.enqueue(song);
-    
-    // ✅ Usar editReply para confirmación
-    return interaction.editReply({ 
-      content: i18n.__mf("play.startedPlaying", { title: song.title }) 
-    }).then(() => {
-      setTimeout(() => {
-        interaction.deleteReply().catch(console.error);
-      }, 5000);
-    }).catch(console.error);
   }
 };
