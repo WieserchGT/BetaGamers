@@ -40,7 +40,7 @@
     "@types/node": "^20.19.22",
     "cz-conventional-changelog": "^3.0.1",
     "nodemon": "^2.0.22",
-    "prettier": "^3.3.1",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3"
