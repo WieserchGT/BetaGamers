@@ -25,7 +25,7 @@ export default {
 
     try {
       // Primero responder y luego eliminar
-      await interaction.reply({ content: "✅ Mensaje enviado", ephemeral: true });
+      await interaction.reply({ content: "Mensaje enviado", ephemeral: true });
       await interaction.deleteReply();
       
       // Enviar el mensaje al canal

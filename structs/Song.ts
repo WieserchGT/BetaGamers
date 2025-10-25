@@ -1,11 +1,7 @@
 import { AudioResource, createAudioResource, StreamType } from "@discordjs/voice";
-import youtube from "youtube-sr";
 import { i18n } from "../utils/i18n";
-import { videoPattern, isURL } from "../utils/patterns";
-import youtubedl from "youtube-dl-exec";
-import * as fs from "fs";
-import * as os from "os";
-import * as path from "path";
+import { videoPattern } from "../utils/patterns";
+import play from "play-dl";
 
 // Configuración de depuración
 const DEBUG_AUDIO = process.env.DEBUG_AUDIO === '1';
@@ -39,89 +35,71 @@ export class Song {
     try {
       const isYoutubeUrl = videoPattern.test(url);
 
-      // Verificar si existe archivo de cookies
-      const cookiesPath = path.join(process.cwd(), 'cookies.txt');
-      const hasCookies = fs.existsSync(cookiesPath);
-
-      // Opciones comunes para youtube-dl-exec
-      const baseOptions: any = {
-        noCheckCertificates: true,
-        noWarnings: true,
-        preferFreeFormats: true,
-        addHeader: [
-          'referer:youtube.com',
-          'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        ],
-        socketTimeout: 60000,
-        forceIpv4: true,
-        retries: 3
-      };
-
-      // Agregar cookies si existen
-      if (hasCookies) {
-        baseOptions.cookies = cookiesPath;
-        dlog('Usando cookies.txt para obtener información del video');
-      }
+      dlog(`Procesando: ${url || search}`, { isYoutubeUrl });
 
       if (isYoutubeUrl) {
         dlog(`Procesando URL de YouTube: ${url}`);
         
-        // Primero intentar con youtube-sr que es más confiable
         try {
-          const video = await youtube.getVideo(url);
-          if (video) {
-            return new this({
-              url: `https://youtube.com/watch?v=${video.id}`,
-              title: video.title || 'Título desconocido',
-              duration: video.duration || 0
-            });
+          // Usar play-dl para obtener información del video
+          const videoInfo = await play.video_info(url);
+          const videoDetails = videoInfo.video_details;
+
+          if (!videoDetails) {
+            throw new Error("No se pudo obtener información del video");
           }
-        } catch (srError) {
-          dlog(`YouTube-SR falló, usando youtube-dl-exec: ${srError}`);
+
+          return new this({
+            url: videoDetails.url,
+            title: videoDetails.title || 'Título desconocido',
+            duration: videoDetails.durationInSec || 0
+          });
+
+        } catch (playError: any) {
+          dlog(`Error con play-dl: ${playError.message}`);
+          throw new Error(`No se pudo obtener información del video: ${playError.message}`);
         }
 
-        // Fallback a youtube-dl-exec
-        const videoInfo: any = await youtubedl(url, {
-          ...baseOptions,
-          dumpSingleJson: true
-        }).catch((error: any) => {
-          dlog(`Error al obtener información del video: ${error.message}`);
-          throw new Error(`No se pudo obtener información del video: ${error.message}`);
-        });
-
-        return new this({
-          url: videoInfo.webpage_url || videoInfo.url || url,
-          title: videoInfo.title || 'Título desconocido',
-          duration: videoInfo.duration || 0
-        });
       } else if (search) {
         dlog(`Buscando: ${search}`);
         
-        // Usar youtube-sr para búsqueda (más confiable)
-        const result = await youtube.searchOne(search).catch((error: any) => {
-          dlog(`Error en la búsqueda: ${error.message}`);
-          throw new Error(`Error al buscar el video: ${error.message}`);
-        });
+        try {
+          // Usar play-dl para búsqueda
+          const searchResults = await play.search(search, { limit: 1 });
+          
+          if (!searchResults || searchResults.length === 0) {
+            throw new Error(`No se encontraron resultados para: ${search}`);
+          }
 
-        if (!result) {
-          throw new Error(`No se encontraron resultados para: ${search}`);
+          const result = searchResults[0];
+          
+          return new this({
+            url: result.url,
+            title: result.title || 'Título desconocido',
+            duration: result.durationInSec || 0
+          });
+
+        } catch (searchError: any) {
+          dlog(`Error en la búsqueda: ${searchError.message}`);
+          throw new Error(`Error al buscar el video: ${searchError.message}`);
         }
-
-        return new this({
-          url: `https://youtube.com/watch?v=${result.id}`,
-          title: result.title || 'Título desconocido',
-          duration: result.duration || 0
-        });
       } else {
         throw new Error('Se requiere una URL o término de búsqueda');
       }
     } catch (error: any) {
       dlog(`Error en Song.from: ${error}`);
+      
+      // Convertir errores de play-dl a errores reconocibles
+      if (error.message?.includes("No se encontraron resultados") || 
+          error.message?.includes("No results")) {
+        throw new Error("NoResults");
+      }
+      
       throw error;
     }
   }
 
-  public async makeResource(): Promise<AudioResource<Song> | void> {
+  public async makeResource(): Promise<AudioResource<Song>> {
     if (!this.url) {
       throw new Error('La URL de la canción no está definida');
     }
@@ -129,59 +107,46 @@ export class Song {
     dlog('Iniciando makeResource', { title: this.title, url: this.url });
 
     try {
-      // Verificar si existe archivo de cookies
-      const cookiesPath = path.join(process.cwd(), 'cookies.txt');
-      const hasCookies = fs.existsSync(cookiesPath);
+      // Usar play-dl para obtener el stream de audio
+      const stream = await play.stream(this.url);
+      
+      dlog('Stream obtenido', { 
+        title: this.title, 
+        type: stream.type
+        // NOTA: stream.quality fue eliminado porque no existe en todos los tipos de stream
+      });
 
-      const options: any = {
-        format: 'bestaudio[ext=webm]/bestaudio/best',
-        noCheckCertificates: true,
-        noWarnings: true,
-        preferFreeFormats: true,
-        addHeader: [
-          'referer:youtube.com',
-          'user-agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        ],
-        socketTimeout: 60000,
-        forceIpv4: true,
-        retries: 3,
-        output: '-'
-      };
-
-      // AGREGAR COOKIES SI EXISTEN - ESTA LÍNEA ES CRÍTICA
-      if (hasCookies) {
-        options.cookies = cookiesPath;
-        dlog('Usando cookies.txt para descarga de audio');
-      } else {
-        dlog('ADVERTENCIA: No se encontró cookies.txt - YouTube puede bloquear la descarga');
-      }
-
-      const proc = youtubedl.exec(this.url, options);
-
-      const resource = createAudioResource(proc.stdout!, {
+      const resource = createAudioResource(stream.stream, {
         metadata: this,
-        inputType: StreamType.Arbitrary,
+        inputType: stream.type,
         inlineVolume: true
       });
 
       dlog('makeResource completado', { title: this.title });
 
-      proc.on('error', (error: any) => {
-        dlog(`Error en el proceso de descarga: ${error}`);
-      });
-
-      proc.on('close', (code: any) => {
-        dlog(`Proceso de descarga finalizado con código: ${code}`);
-      });
-
       return resource;
     } catch (error: any) {
       dlog(`Error en makeResource: ${error}`);
-      throw error;
+      
+      if (error.message?.includes("Sign in to confirm") || 
+          error.message?.includes("cookies")) {
+        throw new Error("YouTube está bloqueando las descargas. Se requieren cookies de autenticación.");
+      }
+      
+      throw new Error(`No se pudo crear el recurso de audio: ${error.message}`);
     }
   }
 
   public startMessage() {
     return i18n.__mf("play.startedPlaying", { title: this.title, url: this.url });
+  }
+
+  // Método auxiliar para formatear duración
+  public get formattedDuration(): string {
+    if (!this.duration) return "0:00";
+    
+    const minutes = Math.floor(this.duration / 60);
+    const seconds = Math.floor(this.duration % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }

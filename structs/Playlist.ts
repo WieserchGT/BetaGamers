@@ -1,40 +1,55 @@
-import youtube, { Playlist as YoutubePlaylist } from "youtube-sr";
-import { config } from "../utils/config";
 import { Song } from "./Song";
+import play from "play-dl";
+import { config } from "../utils/config";
 
 const pattern = /^.*(youtu.be\/|list=)([^#\&\?]*).*/i;
 
 export class Playlist {
-  public data: YoutubePlaylist;
-  public videos: Song[];
+  public readonly data: Song[];
+  public readonly title: string;
 
-  public constructor(playlist: YoutubePlaylist) {
-    this.data = playlist;
-
-    this.videos = this.data.videos
-      .filter((video) => video.title != "Private video" && video.title != "Deleted video")
-      .slice(0, config.MAX_PLAYLIST_SIZE - 1)
-      .map((video) => {
-        return new Song({
-          title: video.title!,
-          url: `https://youtube.com/watch?v=${video.id}`,
-          duration: video.duration / 1000
-        });
-      });
+  constructor({ data, title }: { data: Song[]; title: string }) {
+    this.data = data;
+    this.title = title;
   }
 
-  public static async from(url: string = "", search: string = "") {
-    const urlValid = pattern.test(url);
-    let playlist;
+  public static async from(url: string = "", search: string = ""): Promise<Playlist | null> {
+    try {
+      const urlValid = pattern.test(url);
+      
+      // Si no es una URL válida de playlist, no podemos buscarla
+      if (!urlValid) {
+        throw new Error("Se requiere una URL válida de playlist de YouTube");
+      }
 
-    if (urlValid) {
-      playlist = await youtube.getPlaylist(url);
-    } else {
-      const result = await youtube.searchOne(search, "playlist");
+      // Usar play-dl para obtener información de playlist
+      const playlistInfo = await play.playlist_info(url);
+      const videos = await playlistInfo.all_videos();
 
-      playlist = await youtube.getPlaylist(result.url!);
+      const songs = videos
+        .filter((video: any) => video.title != "Private video" && video.title != "Deleted video")
+        .slice(0, config.MAX_PLAYLIST_SIZE - 1)
+        .map((video: any) => {
+          return new Song({
+            url: video.url,
+            title: video.title!,
+            duration: video.durationInSec || 0
+          });
+        });
+
+      return new Playlist({
+        data: songs,
+        title: playlistInfo.title || "Playlist sin título"
+      });
+
+    } catch (error) {
+      console.error("Error obteniendo playlist:", error);
+      return null;
     }
+  }
 
-    return new this(playlist);
+  // Propiedad de compatibilidad para mantener la estructura vieja
+  public get videos(): Song[] {
+    return this.data;
   }
 }
