@@ -5,15 +5,19 @@ import { MusicQueue } from "../structs/MusicQueue";
 import { Song } from "../structs/Song";
 import { i18n as i18nConfig } from "../utils/i18n";
 import { playlistPattern } from "../utils/patterns";
-import play from "play-dl";
 
 export default {
   data: new SlashCommandBuilder()
     .setName("play")
     .setDescription(i18nConfig.__("play.description"))
-    .addStringOption((option) => option.setName("song").setDescription("The song you want to play").setRequired(true)),
+    .addStringOption((option) => 
+      option.setName("song")
+        .setDescription("The song you want to play")
+        .setRequired(true)
+    ),
   cooldown: 3,
   permissions: [PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak],
+  
   async execute(interaction: ChatInputCommandInteraction) {
     if (!interaction.isCommand() || interaction.deferred || interaction.replied) {
       return;
@@ -54,7 +58,6 @@ export default {
     }
 
     try {
-      // ✅ USANDO play-dl EN LUGAR DE youtube-dl-exec
       const song = await Song.from(argSongName, argSongName);
       
       if (!song) {
@@ -86,7 +89,6 @@ export default {
       return interaction.editReply({ 
         content: i18nConfig.__mf("play.startedPlaying", { title: song.title })
       });
-
     } catch (error: any) {
       console.error("Error en comando play:", error);
       

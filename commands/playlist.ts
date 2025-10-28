@@ -16,9 +16,14 @@ export default {
   data: new SlashCommandBuilder()
     .setName("playlist")
     .setDescription(i18n.__("playlist.description"))
-    .addStringOption((option) => option.setName("playlist").setDescription("Playlist name or link").setRequired(true)),
+    .addStringOption((option) => 
+      option.setName("playlist")
+        .setDescription("Playlist name or link")
+        .setRequired(true)
+    ),
   cooldown: 5,
   permissions: [PermissionsBitField.Flags.Connect, PermissionsBitField.Flags.Speak],
+  
   async execute(interaction: ChatInputCommandInteraction, queryOptionName = "playlist") {
     let argSongName = interaction.options.getString(queryOptionName);
 
@@ -27,21 +32,24 @@ export default {
 
     const queue = bot.queues.get(interaction.guild!.id);
 
-    if (!channel)
-      return interaction.reply({ content: i18n.__("playlist.errorNotChannel"), ephemeral: true }).catch(console.error);
+    if (!channel) {
+      return interaction.reply({ 
+        content: i18n.__("playlist.errorNotChannel"), 
+        ephemeral: true 
+      }).catch(console.error);
+    }
 
     if (queue && channel.id !== queue.connection.joinConfig.channelId) {
-      if (interaction.replied)
-        return interaction
-          .editReply({ content: i18n.__mf("play.errorNotInSameChannel", { user: interaction.client.user!.username }) })
-          .catch(console.error);
-      else
-        return interaction
-          .reply({
-            content: i18n.__mf("play.errorNotInSameChannel", { user: interaction.client.user!.username }),
-            ephemeral: true
-          })
-          .catch(console.error);
+      if (interaction.replied) {
+        return interaction.editReply({ 
+          content: i18n.__mf("play.errorNotInSameChannel", { user: interaction.client.user!.username }) 
+        }).catch(console.error);
+      } else {
+        return interaction.reply({
+          content: i18n.__mf("play.errorNotInSameChannel", { user: interaction.client.user!.username }),
+          ephemeral: true
+        }).catch(console.error);
+      }
     }
 
     let playlist;
@@ -51,25 +59,32 @@ export default {
     } catch (error) {
       console.error(error);
 
-      if (interaction.replied)
-        return interaction.editReply({ content: i18n.__("playlist.errorNotFoundPlaylist") }).catch(console.error);
-      else
-        return interaction
-          .reply({ content: i18n.__("playlist.errorNotFoundPlaylist"), ephemeral: true })
-          .catch(console.error);
+      if (interaction.replied) {
+        return interaction.editReply({ 
+          content: i18n.__("playlist.errorNotFoundPlaylist") 
+        }).catch(console.error);
+      } else {
+        return interaction.reply({ 
+          content: i18n.__("playlist.errorNotFoundPlaylist"), 
+          ephemeral: true 
+        }).catch(console.error);
+      }
     }
 
     if (!playlist) {
-      if (interaction.replied)
-        return interaction.editReply({ content: i18n.__("playlist.errorNotFoundPlaylist") }).catch(console.error);
-      else
-        return interaction
-          .reply({ content: i18n.__("playlist.errorNotFoundPlaylist"), ephemeral: true })
-          .catch(console.error);
+      if (interaction.replied) {
+        return interaction.editReply({ 
+          content: i18n.__("playlist.errorNotFoundPlaylist") 
+        }).catch(console.error);
+      } else {
+        return interaction.reply({ 
+          content: i18n.__("playlist.errorNotFoundPlaylist"), 
+          ephemeral: true 
+        }).catch(console.error);
+      }
     }
 
     if (queue) {
-      // CORREGIDO: usar playlist.data en lugar de playlist.videos
       playlist.data.forEach(song => queue.enqueue(song));
     } else {
       const newQueue = new MusicQueue({
@@ -83,7 +98,6 @@ export default {
       });
 
       bot.queues.set(interaction.guild!.id, newQueue);
-      // CORREGIDO: usar playlist.data en lugar de playlist.videos
       playlist.data.forEach(song => newQueue.enqueue(song));
     }
 
@@ -104,12 +118,10 @@ export default {
         embeds: [playlistEmbed]
       });
     } else {
-      return interaction
-        .reply({
-          content: i18n.__mf("playlist.startedPlaylist", { author: interaction.user.id }),
-          embeds: [playlistEmbed]
-        })
-        .catch(console.error);
+      return interaction.reply({
+        content: i18n.__mf("playlist.startedPlaylist", { author: interaction.user.id }),
+        embeds: [playlistEmbed]
+      }).catch(console.error);
     }
   }
 };

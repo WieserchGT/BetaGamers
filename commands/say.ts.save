@@ -1,4 +1,8 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { config } from "../config";
+import { config } from "../config";
+import { config } from "../config";
+await interaction.channel?.send({
 
 export default {
   data: new SlashCommandBuilder()
@@ -11,6 +15,7 @@ export default {
     ),
 
   async execute(interaction: ChatInputCommandInteraction) {
+    // Verificar si el usuario tiene permisos de administrador
     if (!interaction.memberPermissions?.has("Administrator")) {
       return interaction.reply({
         content: "❌ No tienes permisos para usar este comando.",
@@ -21,23 +26,21 @@ export default {
     const mensaje = interaction.options.getString("mensaje", true);
 
     try {
+      // Primero defer la interacción para tener más tiempo
       await interaction.deferReply();
       
-      if (interaction.channel && 'send' in interaction.channel) {
-        await interaction.channel.send({
-          content: mensaje,
-          allowedMentions: { parse: [] }
-        });
-        
-        await interaction.deleteReply();
-      } else {
-        await interaction.editReply({
-          content: "❌ No puedo enviar mensajes en este canal."
-        });
-      }
+      // Eliminar el reply y enviar el mensaje directamente al canal
+      await interaction.channel?.send({
+        content: mensaje,
+        allowedMentions: { parse: [] }
+      });
+      
+      // Eliminar el reply fantasma
+      await interaction.deleteReply();
     } catch (error) {
       console.error("Error en comando say:", error);
       
+      // Si ya hicimos defer, editamos la respuesta
       if (interaction.deferred) {
         await interaction.editReply({
           content: "❌ Error al enviar el mensaje."
