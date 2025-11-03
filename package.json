@@ -35,7 +35,7 @@
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
-    "@types/express": "^5.0.3",
+    "@types/express": "^5.0.5",
     "@types/i18n": "^0.13.12",
     "@types/node": "^20.19.22",
     "cz-conventional-changelog": "^3.0.1",
