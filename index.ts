@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Collection, ActivityType } from "discord.js";
-import { Bot } from "./structs/Bot.js";
+import { Bot } from "./structs/Bot.ts";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { pathToFileURL } from "node:url";

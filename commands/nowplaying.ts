@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { splitBar } from "string-progressbar";
-import { bot } from "../index.js";
-import { i18n } from "../utils/i18n.js";
+import { bot } from "../index.ts";
+import { i18n } from "../utils/i18n.ts";
 
 export default {
   data: new SlashCommandBuilder().setName("nowplaying").setDescription(i18n.__("nowplaying.description")),

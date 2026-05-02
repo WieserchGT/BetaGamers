@@ -1,6 +1,6 @@
 import i18n from "i18n";
 import { join } from "path";
-import { config } from "./config.js";
+import { config } from "./config.ts";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,10 +1,10 @@
 import { DiscordGatewayAdapterCreator, joinVoiceChannel } from "@discordjs/voice";
 import { ChatInputCommandInteraction, PermissionsBitField, SlashCommandBuilder, TextChannel } from "discord.js";
-import { bot } from "../index.js";
-import { MusicQueue } from "../structs/MusicQueue.js";
-import { Song } from "../structs/Song.js";
-import { i18n as i18nConfig } from "../utils/i18n.js";
-import { playlistPattern } from "../utils/patterns.js";
+import { bot } from "../index.ts";
+import { MusicQueue } from "../structs/MusicQueue.ts";
+import { Song } from "../structs/Song.ts";
+import { i18n as i18nConfig } from "../utils/i18n.ts";
+import { playlistPattern } from "../utils/patterns.ts";
 
 export default {
   data: new SlashCommandBuilder()

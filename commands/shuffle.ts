@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-import { bot } from "../index.js";
-import { i18n } from "../utils/i18n.js";
-import { canModifyQueue } from "../utils/queue.js";
-import { safeReply } from "../utils/safeReply.js";
+import { bot } from "../index.ts";
+import { i18n } from "../utils/i18n.ts";
+import { canModifyQueue } from "../utils/queue.ts";
+import { safeReply } from "../utils/safeReply.ts";
 
 export default {
   data: new SlashCommandBuilder().setName("shuffle").setDescription(i18n.__("shuffle.description")),

@@ -12,12 +12,12 @@ import {
 import { readdirSync } from "fs";
 import { join } from "path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { Command } from "../interfaces/Command.js";
-import { checkPermissions, PermissionResult } from "../utils/checkPermissions.js";
-import { config } from "../utils/config.js";
-import { i18n } from "../utils/i18n.js";
-import { MissingPermissionsException } from "../utils/MissingPermissionsException.js";
-import { MusicQueue } from "./MusicQueue.js";
+import { Command } from "../interfaces/Command.ts";
+import { checkPermissions, PermissionResult } from "../utils/checkPermissions.ts";
+import { config } from "../utils/config.ts";
+import { i18n } from "../utils/i18n.ts";
+import { MissingPermissionsException } from "../utils/MissingPermissionsException.ts";
+import { MusicQueue } from "./MusicQueue.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = __filename.substring(0, __filename.lastIndexOf("/"));

@@ -1,6 +1,6 @@
-import { Song } from "./Song.js";
+import { Song } from "./Song.ts";
 import play from "play-dl";
-import { config } from "../utils/config.js";
+import { config } from "../utils/config.ts";
 
 const pattern = /^.*(youtu.be\/|list=)([^#\&\?]*).*/i;
 
