@@ -2,9 +2,9 @@
   "compilerOptions": {
     "strict": true,
     "outDir": "dist",
-    "module": "commonjs",
+    "module": "nodenext",
     "target": "es2022",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": true,
