@@ -31,7 +31,7 @@ export default {
         return;
       }
 
-      console.log(`🔍 Help encontró ${commands.size} comandos:`);
+      console.log(`Help encontro ${commands.size} comandos:`);
       commands.forEach((cmd, name) => {
         console.log(` - ${name}: ${cmd.data.description}`);
       });

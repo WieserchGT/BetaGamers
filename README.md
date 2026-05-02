@@ -14,36 +14,38 @@
    1.1. Enable 'Message Content Intent' in Discord Developer Portal
 2. Node.js 16.11.0 or newer
 
-## 🚀 Getting Started
+## Getting Started
 
 ```sh
 git clone https://github.com/WieserchGT/BetaGamers.git
 cd BetaGamers
 npm install
+cp .env.example .env
+```
 
-After installation finishes follow configuration instructions then run npm run start to start the bot.
+Edit `.env` and set at least `TOKEN`.
 
-⚙️ Configuration
-Copy or Rename config.json.example to config.json and fill out the values:
+Run in development:
 
-⚠️ Note: Never commit or share your token or api keys publicly ⚠️
+```sh
+npm run start
+```
 
-json
-{
-  "TOKEN": "",
-  "MAX_PLAYLIST_SIZE": 10,
-  "PRUNING": false,
-  "LOCALE": "en",
-  "DEFAULT_VOLUME": 100,
-  "STAY_TIME": 30
-}
-🐬 Docker Configuration
-For those who would prefer to use Docker, you may provide values from config.json as environment variables.
+Run in production:
 
-shell
-docker run -e "TOKEN=<discord-token>" wieserchgt/betagaming
-📝 Features & Commands
-🎶 Play music from YouTube via url
+```sh
+npm run prod
+```
+
+HiddenCloud notes:
+- Main file can be `index.js`.
+- The project reads configuration from `.env`.
+- Recommended timezone for Queretaro, Mexico: `America/Mexico_City`.
+
+Note: Never commit or share your token or api keys publicly.
+
+## Features and Commands
+Play music from YouTube via url
 
 /play https://www.youtube.com/watch?v=GLvohMXgcBo
 

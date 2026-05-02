@@ -29,7 +29,7 @@ const client = new Client({
     GatewayIntentBits.MessageContent
   ],
   presence: {
-    activities: [{ name: 'música 🎵', type: ActivityType.Listening }],
+    activities: [{ name: 'musica', type: ActivityType.Listening }],
     status: 'online'
   }
 });
@@ -37,14 +37,14 @@ const client = new Client({
 client.slashCommands = new Collection();
 
 async function loadSlashCommands() {
-  console.log('🔧 Cargando comandos...');
+  console.log('Cargando comandos...');
   
   const commandsPath = path.join(process.cwd(), 'dist', 'commands');
   
-  console.log(`🔍 Buscando en: ${commandsPath}`);
+  console.log(`Buscando en: ${commandsPath}`);
   
   if (!fs.existsSync(commandsPath)) {
-    console.error('❌ No se encontró dist/commands');
+    console.error('No se encontro dist/commands');
     return 0;
   }
 
@@ -52,7 +52,7 @@ async function loadSlashCommands() {
     file.endsWith('.js') && !file.endsWith('.map')
   );
 
-  console.log(`📁 Encontrados ${commandFiles.length} archivos .js`);
+  console.log(`Encontrados ${commandFiles.length} archivos .js`);
 
   let loadedCount = 0;
   
@@ -68,26 +68,26 @@ async function loadSlashCommands() {
         console.log(`✅ ${command.data.name}`);
         loadedCount++;
       } else {
-        console.log(`⚠️  ${file} - estructura inválida`);
+        console.log(`${file} - estructura invalida`);
       }
     } catch (error: any) {
-      console.error(`❌ Error cargando ${file}:`, error.message);
+      console.error(`Error cargando ${file}:`, error.message);
     }
   }
   
-  console.log(`🎉 ${loadedCount}/${commandFiles.length} comandos cargados`);
+  console.log(`✅ ${loadedCount}/${commandFiles.length} comandos cargados`);
   return loadedCount;
 }
 
 client.once('ready', async () => {
-  console.log(`🎉 ${client.user!.tag} conectado a Discord!`);
+  console.log(`✅ ${client.user!.tag} conectado a Discord`);
   
   await loadSlashCommands();
   
-  console.log(`𝔹𝕖𝕥𝕒𝔾𝕒𝕞𝕚𝕟𝕘® ready!`);
-  console.log(`📊 Servidores: ${client.guilds.cache.size}`);
-  console.log(`👥 Usuarios: ${client.users.cache.size}`);
-  console.log(`🔧 Comandos: ${client.slashCommands.size}`);
+  console.log('BetaGaming ready');
+  console.log(`Servidores: ${client.guilds.cache.size}`);
+  console.log(`Usuarios: ${client.users.cache.size}`);
+  console.log(`Comandos: ${client.slashCommands.size}`);
   
   client.user!.setPresence({
     activities: [{ name: `${client.guilds.cache.size} servidores | /play`, type: ActivityType.Listening }],
@@ -101,20 +101,20 @@ client.on('interactionCreate', async (interaction) => {
   const command = client.slashCommands.get(interaction.commandName);
   
   if (!command) {
-    console.error(`❌ Comando no encontrado: ${interaction.commandName}`);
+    console.error(`Comando no encontrado: ${interaction.commandName}`);
     return;
   }
 
   try {
     await command.execute(interaction);
   } catch (error: any) {
-    console.error(`💥 Error en ${interaction.commandName}:`, error);
+    console.error(`Error en ${interaction.commandName}:`, error);
     
     try {
       if (interaction.replied || interaction.deferred) {
-        await interaction.editReply('❌ Error ejecutando el comando.');
+        await interaction.editReply('Error ejecutando el comando.');
       } else {
-        await interaction.reply({ content: '❌ Error ejecutando el comando.', ephemeral: true });
+        await interaction.reply({ content: 'Error ejecutando el comando.', ephemeral: true });
       }
     } catch (replyError) {
       console.error('Error al responder:', replyError);
@@ -123,26 +123,26 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 process.on('unhandledRejection', (error) => {
-  console.error('🚨 UNHANDLED REJECTION:', error);
+  console.error('UNHANDLED REJECTION:', error);
 });
 
 process.on('uncaughtException', (error) => {
-  console.error('💥 UNCAUGHT EXCEPTION:', error);
+  console.error('UNCAUGHT EXCEPTION:', error);
   setTimeout(() => process.exit(1), 1000);
 });
 
 process.on('SIGINT', async () => {
-  console.log('\n📴 Apagando...');
+  console.log('\nApagando...');
   server.close();
   if (client.isReady()) client.destroy();
   setTimeout(() => process.exit(0), 3000);
 });
 
-console.log('🚀 Inicializando bot...');
+console.log('Inicializando bot...');
 
 export const bot = new Bot(client);
 
 client.login(process.env.TOKEN).catch((error) => {
-  console.error('❌ Error iniciando sesión:', error);
+  console.error('Error iniciando sesion:', error);
   process.exit(1);
 });

@@ -7,7 +7,6 @@ npm-debug.log
 .gitignore
 .node-version
 .prettierrc
-.replit
 config.json
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md
