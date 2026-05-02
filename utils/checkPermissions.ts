@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, PermissionResolvable } from "discord.js";
+import type { ChatInputCommandInteraction, PermissionResolvable } from "discord.js";
 import type { Command } from "../interfaces/Command.ts";
 
 export interface PermissionResult {

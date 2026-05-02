@@ -1,4 +1,4 @@
-import { ButtonInteraction, CommandInteraction } from "discord.js";
+import type { ButtonInteraction, CommandInteraction } from "discord.js";
 
 export async function safeReply(interaction: CommandInteraction | ButtonInteraction, content: string) {
   try {
