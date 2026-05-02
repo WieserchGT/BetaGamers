@@ -2,7 +2,7 @@ import { Client, GatewayIntentBits, Collection, ActivityType } from "discord.js"
 import { Bot } from "./structs/Bot.ts";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import express from 'express';
 
 declare module "discord.js" {
@@ -36,13 +36,14 @@ const client = new Client({
 });
 
 client.slashCommands = new Collection();
+const currentFilePath = fileURLToPath(import.meta.url);
 
 async function loadSlashCommands() {
   console.log('Cargando comandos...');
 
   const sourceCommandsPath = path.join(process.cwd(), 'commands');
   const distCommandsPath = path.join(process.cwd(), 'dist', 'commands');
-  const isTsRuntime = __filename.endsWith('.ts');
+  const isTsRuntime = currentFilePath.endsWith('.ts');
 
   const commandsPath = isTsRuntime
     ? (fs.existsSync(sourceCommandsPath) ? sourceCommandsPath : distCommandsPath)

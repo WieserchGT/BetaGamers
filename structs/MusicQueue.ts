@@ -17,14 +17,12 @@ import type {
 import {
   ActionRowBuilder,
   ButtonBuilder,
-  ButtonInteraction,
   ButtonStyle,
-  CommandInteraction,
-  GuildMember,
-  Interaction,
-  Message,
   TextChannel
 } from "discord.js";
+import type { ButtonInteraction, CommandInteraction, GuildMember, Message } from "discord.js";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { promisify } from "node:util";
 import { bot } from "../index.ts";
 import type { QueueOptions } from "../interfaces/QueueOptions.ts";
@@ -36,8 +34,6 @@ import { safeReply } from "../utils/safeReply.ts";
 
 const DEBUG_AUDIO = process.env.DEBUG_AUDIO === '1';
 const LAST_DEBUG_PATH = process.env.LAST_DEBUG_PATH;
-const path = require('node:path');
-const fs = require('node:fs');
 const lastDebugPath = LAST_DEBUG_PATH || path.join(process.cwd(), 'logs', 'last-debug.log');
 const dwrite = (line: string) => {
   try {
