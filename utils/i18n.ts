@@ -1,6 +1,10 @@
 import i18n from "i18n";
 import { join } from "path";
-import { config } from "./config";
+import { config } from "./config.js";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = join(__filename, "..");
 
 i18n.configure({
   locales: [

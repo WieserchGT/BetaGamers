@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Config } from "../interfaces/Config";
+import { Config } from "../interfaces/Config.js";
 
 const config: Config = {
   TOKEN: process.env.TOKEN || "",

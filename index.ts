@@ -1,7 +1,8 @@
 import { Client, GatewayIntentBits, Collection, ActivityType } from "discord.js";
-import { Bot } from "./structs/Bot";
+import { Bot } from "./structs/Bot.js";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { pathToFileURL } from "node:url";
 import express from 'express';
 
 declare module "discord.js" {
@@ -69,7 +70,7 @@ async function loadSlashCommands() {
     try {
       const filePath = path.join(commandsPath, file);
       
-      const commandModule = require(filePath);
+      const commandModule = await import(pathToFileURL(filePath).href);
       const command = commandModule.default || commandModule;
       
       if (command && command.data && command.execute) {

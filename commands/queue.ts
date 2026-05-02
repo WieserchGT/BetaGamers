@@ -8,9 +8,9 @@ import {
   Interaction,
   SlashCommandBuilder
 } from "discord.js";
-import { bot } from "../index";
-import { Song } from "../structs/Song";
-import { i18n } from "../utils/i18n";
+import { bot } from "../index.js";
+import { Song } from "../structs/Song.js";
+import { i18n } from "../utils/i18n.js";
 
 export default {
   data: new SlashCommandBuilder().setName("queue").setDescription(i18n.__("queue.description")),

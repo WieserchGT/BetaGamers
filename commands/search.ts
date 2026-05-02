@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import play from "play-dl";
 import { bot } from "..";
-import { i18n } from "../utils/i18n";
+import { i18n } from "../utils/i18n.js";
 
 export default {
   data: new SlashCommandBuilder()

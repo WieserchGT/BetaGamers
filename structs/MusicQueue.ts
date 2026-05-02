@@ -24,13 +24,13 @@ import {
   TextChannel
 } from "discord.js";
 import { promisify } from "node:util";
-import { bot } from "../index";
-import { QueueOptions } from "../interfaces/QueueOptions";
-import { config } from "../utils/config";
-import { i18n } from "../utils/i18n";
-import { canModifyQueue } from "../utils/queue";
-import { Song } from "./Song";
-import { safeReply } from "../utils/safeReply";
+import { bot } from "../index.js";
+import { QueueOptions } from "../interfaces/QueueOptions.js";
+import { config } from "../utils/config.js";
+import { i18n } from "../utils/i18n.js";
+import { canModifyQueue } from "../utils/queue.js";
+import { Song } from "./Song.js";
+import { safeReply } from "../utils/safeReply.js";
 
 const DEBUG_AUDIO = process.env.DEBUG_AUDIO === '1';
 const LAST_DEBUG_PATH = process.env.LAST_DEBUG_PATH;

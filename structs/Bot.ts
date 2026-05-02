@@ -11,12 +11,16 @@ import {
 } from "discord.js";
 import { readdirSync } from "fs";
 import { join } from "path";
-import { Command } from "../interfaces/Command";
-import { checkPermissions, PermissionResult } from "../utils/checkPermissions";
-import { config } from "../utils/config";
-import { i18n } from "../utils/i18n";
-import { MissingPermissionsException } from "../utils/MissingPermissionsException";
-import { MusicQueue } from "./MusicQueue";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { Command } from "../interfaces/Command.js";
+import { checkPermissions, PermissionResult } from "../utils/checkPermissions.js";
+import { config } from "../utils/config.js";
+import { i18n } from "../utils/i18n.js";
+import { MissingPermissionsException } from "../utils/MissingPermissionsException.js";
+import { MusicQueue } from "./MusicQueue.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = __filename.substring(0, __filename.lastIndexOf("/"));
 
 export class Bot {
   public readonly prefix = "/";
@@ -51,7 +55,7 @@ export class Bot {
     const commandFiles = readdirSync(join(__dirname, "..", "commands")).filter((file) => !file.endsWith(".map"));
 
     for (const file of commandFiles) {
-      const command = await import(join(__dirname, "..", "commands", `${file}`));
+      const command = await import(pathToFileURL(join(__dirname, "..", "commands", `${file}`)).href);
       
       const commandName = command.default.data.name;
       

@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, PermissionResolvable } from "discord.js";
-import { Command } from "../interfaces/Command";
+import { Command } from "../interfaces/Command.js";
 
 export interface PermissionResult {
   result: boolean;

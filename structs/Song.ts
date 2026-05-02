@@ -1,6 +1,6 @@
 import { AudioResource, createAudioResource } from "@discordjs/voice";
-import { i18n } from "../utils/i18n";
-import { videoPattern } from "../utils/patterns";
+import { i18n } from "../utils/i18n.js";
+import { videoPattern } from "../utils/patterns.js";
 import play from "play-dl";
 
 const DEBUG_AUDIO = process.env.DEBUG_AUDIO === '1';

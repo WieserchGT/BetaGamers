@@ -1,8 +1,8 @@
 import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
-import { i18n } from "../utils/i18n";
+import { i18n } from "../utils/i18n.js";
 // @ts-ignore
 import lyricsFinder from "lyrics-finder";
-import { bot } from "../index";
+import { bot } from "../index.js";
 
 export default {
   data: new SlashCommandBuilder().setName("lyrics").setDescription(i18n.__("lyrics.description")),

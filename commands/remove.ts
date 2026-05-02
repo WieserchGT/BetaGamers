@@ -1,8 +1,8 @@
 import { SlashCommandBuilder, CommandInteraction, ChatInputCommandInteraction } from "discord.js";
-import { bot } from "../index";
-import { Song } from "../structs/Song";
-import { i18n } from "../utils/i18n";
-import { canModifyQueue } from "../utils/queue";
+import { bot } from "../index.js";
+import { Song } from "../structs/Song.js";
+import { i18n } from "../utils/i18n.js";
+import { canModifyQueue } from "../utils/queue.js";
 
 const pattern = /^[0-9]{1,2}(\s*,\s*[0-9]{1,2})*$/;
 
