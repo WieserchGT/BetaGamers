@@ -25,7 +25,7 @@ import {
 } from "discord.js";
 import { promisify } from "node:util";
 import { bot } from "../index.ts";
-import { QueueOptions } from "../interfaces/QueueOptions.ts";
+import type { QueueOptions } from "../interfaces/QueueOptions.ts";
 import { config } from "../utils/config.ts";
 import { i18n } from "../utils/i18n.ts";
 import { canModifyQueue } from "../utils/queue.ts";

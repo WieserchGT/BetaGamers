@@ -12,7 +12,7 @@ import {
 import { readdirSync } from "fs";
 import { join } from "path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { Command } from "../interfaces/Command.ts";
+import type { Command } from "../interfaces/Command.ts";
 import { checkPermissions, PermissionResult } from "../utils/checkPermissions.ts";
 import { config } from "../utils/config.ts";
 import { i18n } from "../utils/i18n.ts";
