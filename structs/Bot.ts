@@ -24,13 +24,15 @@ const __dirname = __filename.substring(0, __filename.lastIndexOf("/"));
 
 export class Bot {
   public readonly prefix = "/";
+  public readonly client: Client;
   public commands = new Collection<string, Command>();
   public slashCommands = new Array<ApplicationCommandDataResolvable>();
   public slashCommandsMap = new Collection<string, Command>();
   public cooldowns = new Collection<string, Collection<Snowflake, number>>();
   public queues = new Collection<Snowflake, MusicQueue>();
 
-  public constructor(public readonly client: Client) {
+  public constructor(client: Client) {
+    this.client = client;
     this.client.login(config.TOKEN);
 
     this.client.on("ready", () => {
