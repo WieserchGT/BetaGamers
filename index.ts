@@ -38,18 +38,27 @@ client.slashCommands = new Collection();
 
 async function loadSlashCommands() {
   console.log('Cargando comandos...');
-  
-  const commandsPath = path.join(process.cwd(), 'dist', 'commands');
-  
+
+  const sourceCommandsPath = path.join(process.cwd(), 'commands');
+  const distCommandsPath = path.join(process.cwd(), 'dist', 'commands');
+  const isTsRuntime = __filename.endsWith('.ts');
+
+  const commandsPath = isTsRuntime
+    ? (fs.existsSync(sourceCommandsPath) ? sourceCommandsPath : distCommandsPath)
+    : (fs.existsSync(distCommandsPath) ? distCommandsPath : sourceCommandsPath);
+
   console.log(`Buscando en: ${commandsPath}`);
-  
+
   if (!fs.existsSync(commandsPath)) {
-    console.error('No se encontro dist/commands');
+    console.error('No se encontro carpeta de comandos');
     return 0;
   }
 
-  const commandFiles = fs.readdirSync(commandsPath).filter(file => 
-    file.endsWith('.js') && !file.endsWith('.map')
+  const useJsFiles = commandsPath.includes(`${path.sep}dist${path.sep}`);
+  const commandFiles = fs.readdirSync(commandsPath).filter(file =>
+    useJsFiles
+      ? (file.endsWith('.js') && !file.endsWith('.map'))
+      : file.endsWith('.ts')
   );
 
   console.log(`Encontrados ${commandFiles.length} archivos .js`);
