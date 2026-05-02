@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder, PermissionFlagsBits, TextChannel } from "discord.js";
+import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import type { ChatInputCommandInteraction, TextChannel } from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()

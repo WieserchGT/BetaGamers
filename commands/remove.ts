@@ -1,4 +1,5 @@
-import { SlashCommandBuilder, CommandInteraction, ChatInputCommandInteraction } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
+import type { CommandInteraction, ChatInputCommandInteraction } from "discord.js";
 import { bot } from "../index.ts";
 import { Song } from "../structs/Song.ts";
 import { i18n } from "../utils/i18n.ts";

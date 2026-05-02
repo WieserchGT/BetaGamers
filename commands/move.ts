@@ -1,5 +1,6 @@
 import move from "array-move";
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
 import { bot } from "../index.ts";
 import { i18n } from "../utils/i18n.ts";
 import { canModifyQueue } from "../utils/queue.ts";

@@ -1,4 +1,5 @@
-import { AudioResource, createAudioResource } from "@discordjs/voice";
+import { createAudioResource } from "@discordjs/voice";
+import type { AudioResource } from "@discordjs/voice";
 import { i18n } from "../utils/i18n.ts";
 import { videoPattern } from "../utils/patterns.ts";
 import play from "play-dl";

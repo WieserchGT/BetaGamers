@@ -1,5 +1,7 @@
-import { DiscordGatewayAdapterCreator, joinVoiceChannel } from "@discordjs/voice";
-import { ChatInputCommandInteraction, PermissionsBitField, SlashCommandBuilder, TextChannel } from "discord.js";
+import { joinVoiceChannel } from "@discordjs/voice";
+import type { DiscordGatewayAdapterCreator } from "@discordjs/voice";
+import { PermissionsBitField, SlashCommandBuilder } from "discord.js";
+import type { ChatInputCommandInteraction, TextChannel } from "discord.js";
 import { bot } from "../index.ts";
 import { MusicQueue } from "../structs/MusicQueue.ts";
 import { Song } from "../structs/Song.ts";

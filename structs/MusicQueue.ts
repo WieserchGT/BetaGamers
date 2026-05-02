@@ -1,16 +1,18 @@
 import {
+  AudioPlayerStatus,
+  NoSubscriberBehavior,
+  VoiceConnectionDisconnectReason,
+  VoiceConnectionStatus,
+  createAudioPlayer,
+  entersState
+} from "@discordjs/voice";
+import type {
   AudioPlayer,
   AudioPlayerPlayingState,
   AudioPlayerState,
-  AudioPlayerStatus,
   AudioResource,
-  createAudioPlayer,
-  entersState,
-  NoSubscriberBehavior,
   VoiceConnection,
-  VoiceConnectionDisconnectReason,
-  VoiceConnectionState,
-  VoiceConnectionStatus
+  VoiceConnectionState
 } from "@discordjs/voice";
 import {
   ActionRowBuilder,

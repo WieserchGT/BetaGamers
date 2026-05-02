@@ -1,4 +1,5 @@
-import { ChatInputCommandInteraction, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import type { ChatInputCommandInteraction } from "discord.js";
 import { splitBar } from "string-progressbar";
 import { bot } from "../index.ts";
 import { i18n } from "../utils/i18n.ts";
